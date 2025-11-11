@@ -117,7 +117,7 @@ class PubgApi {
   }
 
   /**
-   * Get player by ID
+   * Get player by ID with match history
    * @param {string} playerId - The player ID
    * @param {string} shard - Platform shard
    * @returns {Promise<object>}
@@ -131,12 +131,137 @@ class PubgApi {
       );
 
       const player = response.data.data;
+
+      // Extract match IDs from relationships
+      const matchIds =
+        player.relationships?.matches?.data?.map((match) => match.id) || [];
+
       return {
         id: player.id,
         name: player.attributes.name,
         shard: player.attributes.shardId,
         patchVersion: player.attributes.patchVersion,
+        matchIds: matchIds,
       };
+    } catch (error) {
+      return this._handleError(error, playerId);
+    }
+  }
+
+  /**
+   * Get match details by match ID
+   * @param {string} matchId - The match ID
+   * @param {string} shard - Platform shard
+   * @returns {Promise<object>}
+   */
+  async getMatchDetails(matchId, shard = "steam") {
+    try {
+      console.log(`🎯 Fetching match details: ${matchId} on ${shard}`);
+
+      const response = await this.client.get(
+        `/shards/${shard}/matches/${matchId}`
+      );
+
+      const matchData = response.data.data;
+      const included = response.data.included || [];
+
+      console.log(
+        `✅ Match fetched: ${matchId} - ${matchData.attributes.gameMode}`
+      );
+
+      return {
+        matchId: matchData.id,
+        gameMode: matchData.attributes.gameMode,
+        mapName: matchData.attributes.mapName,
+        duration: matchData.attributes.duration,
+        createdAt: matchData.attributes.createdAt,
+        included: included, // Contains participant and roster data
+      };
+    } catch (error) {
+      return this._handleError(error, matchId);
+    }
+  }
+
+  /**
+   * Get player stats from recent matches
+   * @param {string} playerId - The player ID
+   * @param {string} shard - Platform shard
+   * @param {number} limit - Number of recent matches to fetch (default 3)
+   * @returns {Promise<Array>}
+   */
+  async getRecentMatchesStats(playerId, shard = "steam", limit = 3) {
+    try {
+      // First, get player to get match IDs
+      const playerData = await this.getPlayerById(playerId, shard);
+      if (playerData.error) {
+        return playerData;
+      }
+
+      const matchIds = playerData.matchIds.slice(0, limit);
+      console.log(`📊 Fetching stats for ${matchIds.length} recent matches`);
+
+      // Fetch all matches in parallel
+      const matchPromises = matchIds.map((matchId) =>
+        this.getMatchDetails(matchId, shard)
+      );
+
+      const matches = await Promise.all(matchPromises);
+
+      // Extract player stats from each match
+      const stats = matches
+        .map((match, index) => {
+          if (match.error) {
+            console.error(`❌ Failed to fetch match ${matchIds[index]}`);
+            return null;
+          }
+
+          // Find participant data for this player
+          const participant = match.included.find(
+            (item) =>
+              item.type === "participant" &&
+              item.attributes.stats.playerId === playerId
+          );
+
+          if (!participant) {
+            console.warn(`⚠️ Player not found in match ${match.matchId}`);
+            return null;
+          }
+
+          const stats = participant.attributes.stats;
+
+          // Find roster that contains this participant to get team rank
+          const roster = match.included.find(
+            (item) =>
+              item.type === "roster" &&
+              item.relationships.participants.data.some(
+                (p) => p.id === participant.id
+              )
+          );
+
+          const teamRank = roster?.attributes?.stats?.rank || null;
+          const teamWon = roster?.attributes?.won === "true";
+
+          return {
+            matchId: match.matchId,
+            gameMode: match.gameMode,
+            mapName: match.mapName,
+            createdAt: match.createdAt,
+            damageDealt: stats.damageDealt,
+            revives: stats.revives,
+            kills: stats.kills,
+            heals: stats.heals,
+            assists: stats.assists,
+            timeSurvived: stats.timeSurvived,
+            walkDistance: stats.walkDistance,
+            rideDistance: stats.rideDistance,
+            teamRank: teamRank,
+            teamWon: teamWon,
+          };
+        })
+        .filter((stat) => stat !== null);
+
+      console.log(`✅ Retrieved stats for ${stats.length} matches`);
+      return stats;
     } catch (error) {
       return this._handleError(error, playerId);
     }

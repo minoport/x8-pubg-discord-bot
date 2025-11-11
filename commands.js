@@ -19,6 +19,15 @@ const INFO_COMMAND = {
   contexts: [0],
 };
 
+// PUBG Stats command
+const STING_COMMAND = {
+  name: "sting",
+  description: "Display statistics from your 3 most recent matches",
+  type: 1,
+  integration_types: [0],
+  contexts: [0],
+};
+
 // Keep test command for debugging
 const TEST_COMMAND = {
   name: "test",
@@ -28,7 +37,7 @@ const TEST_COMMAND = {
   contexts: [0, 1, 2],
 };
 
-const ALL_COMMANDS = [REGISTER_COMMAND, INFO_COMMAND, TEST_COMMAND];
+const ALL_COMMANDS = [REGISTER_COMMAND, INFO_COMMAND, STING_COMMAND];
 
 console.log("📝 Registering commands...");
 console.log("Commands:", ALL_COMMANDS.map((c) => c.name).join(", "));

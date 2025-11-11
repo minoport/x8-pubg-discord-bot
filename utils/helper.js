@@ -45,3 +45,18 @@ export function getRandomEmoji() {
 export function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function getMapDisplayName(mapCode) {
+  const mapNames = {
+    Baltic_Main: "Erangel",
+    Desert_Main: "Miramar",
+    DihorOtok_Main: "Vikendi",
+    Erangel_Main: "Erangel",
+    Savage_Main: "Sanhok",
+    Summerland_Main: "Karakin",
+    Taego_Main: "Taego",
+    Chimera_Main: "Paramo",
+    Neon_Main: "Rondo",
+  };
+  return mapNames[mapCode] || capitalize(mapCode.replace(/_/g, " "));
+}

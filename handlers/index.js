@@ -10,6 +10,8 @@ export {
 
 export { handleInfoCommand } from "./infoHandler.js";
 
+export { handleStatsCommand } from "./statsHandler.js";
+
 /**
  * Command handler map for easy routing
  */

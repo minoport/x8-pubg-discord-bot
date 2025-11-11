@@ -1,0 +1,13 @@
+{
+  "watch": [
+    "app.js",
+    "handlers/**/*.js",
+    "models/**/*.js",
+    "utils/**/*.js",
+    "config/**/*.js"
+  ],
+  "ext": "js,json",
+  "ignore": ["node_modules/**", "data/**", ".git/**"],
+  "delay": 1000,
+  "verbose": true
+}

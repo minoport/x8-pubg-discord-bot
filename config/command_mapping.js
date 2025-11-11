@@ -2,12 +2,14 @@ import {
   handleRegisterCommand,
   handleRegisterModalSubmit,
   handleInfoCommand,
+  handleStatsCommand,
 } from "../handlers/index.js";
 
 // Command handlers mapping
 const COMMAND_HANDLERS = {
   register: handleRegisterCommand,
   info: handleInfoCommand,
+  sting: handleStatsCommand,
 };
 
 // Modal handlers mapping
