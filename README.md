@@ -45,22 +45,17 @@ discord-example-app/
 - Node.js >= 18.x
 - Discord Application (Bot Token, App ID, Public Key)
 - PUBG Developer API Key
-- ngrok or similar tunneling service (for development)
 
-### Installation
+### Local Development
 
-1. **Clone the repository**
+1. **Clone and install**
    ```bash
    git clone <repository-url>
    cd discord-example-app
-   ```
-
-2. **Install dependencies**
-   ```bash
    npm install
    ```
 
-3. **Configure environment variables**
+2. **Configure environment**
    
    Copy `.env.sample` to `.env` and fill in your credentials:
    ```env
@@ -71,25 +66,40 @@ discord-example-app/
    PUBG_BASE_URL=https://api.pubg.com
    ```
 
-4. **Register Discord commands**
+3. **Register commands (one-time)**
    ```bash
    npm run register
    ```
 
-5. **Start the bot**
+4. **Start the bot**
    ```bash
    npm start
+   # OR with auto-reload
+   npm run dev
    ```
 
-6. **Setup ngrok (for development)**
+5. **Setup ngrok for local testing**
    ```bash
    ngrok http 3000
    ```
    
-   Then update your Discord Application's Interactions Endpoint URL with:
+   Update Discord Interactions Endpoint URL:
    ```
    https://your-ngrok-url.ngrok-free.app/interactions
    ```
+
+### Deploy to Production
+
+See [RENDER_DEPLOY.md](RENDER_DEPLOY.md) for detailed deployment guide to Render (Recommended).
+
+**Quick Deploy to Render:**
+1. Push to GitHub
+2. Connect repository on Render
+3. Add environment variables
+4. Deploy (commands auto-register!)
+5. Update Discord Interactions URL
+
+Your bot will automatically register commands on every deploy! 🎉
 
 ## 📝 Available Commands
 

@@ -9,6 +9,27 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 /**
+ * Health check endpoint for monitoring
+ */
+app.get("/", (req, res) => {
+  res.json({
+    status: "ok",
+    service: "PUBG Discord Bot",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+
+app.get("/health", (req, res) => {
+  res.json({
+    status: "healthy",
+    service: "PUBG Discord Bot",
+    version: "1.0.0",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+/**
  * Interactions endpoint URL where Discord will send HTTP requests
  * Parse request body and verifies incoming requests using discord-interactions package
  */
