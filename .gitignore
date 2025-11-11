@@ -1,2 +1,7 @@
 node_modules
 .env
+
+# Data storage
+data/
+*.json.backup
+app.js.backup
